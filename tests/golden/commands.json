@@ -1,0 +1,5 @@
+[
+  {"name": "IN", "kind": "numbers", "args": [], "span": [0, 3], "payload_span": [2, 2], "data_hex": ""},
+  {"name": "PA", "kind": "numbers", "args": [0, 0], "span": [3, 9], "payload_span": [5, 8], "data_hex": "302c30"},
+  {"name": "PD", "kind": "numbers", "args": [40, -20], "span": [9, 18], "payload_span": [11, 17], "data_hex": "34302c2d3230"}
+]

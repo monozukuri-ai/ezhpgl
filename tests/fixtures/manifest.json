@@ -1,0 +1,252 @@
+[
+  {
+    "file": "empty.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": []
+  },
+  {
+    "file": "padding.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": []
+  },
+  {
+    "file": "line.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "IN",
+      "SP",
+      "PU",
+      "PD"
+    ]
+  },
+  {
+    "file": "concatenated.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "IN",
+      "SP",
+      "PA",
+      "PD"
+    ]
+  },
+  {
+    "file": "lowercase.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "IN",
+      "SP",
+      "PU"
+    ]
+  },
+  {
+    "file": "decimals.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "PA"
+    ]
+  },
+  {
+    "file": "whitespace.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "PA",
+      "SP"
+    ]
+  },
+  {
+    "file": "label.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "LB"
+    ]
+  },
+  {
+    "file": "label_commands.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "LB",
+      "IN"
+    ]
+  },
+  {
+    "file": "label_binary.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "LB"
+    ]
+  },
+  {
+    "file": "dt_custom.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "LB",
+      "SP"
+    ]
+  },
+  {
+    "file": "dt_print.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "LB"
+    ]
+  },
+  {
+    "file": "dt_space.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "LB",
+      "SP"
+    ]
+  },
+  {
+    "file": "dt_digit.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "LB"
+    ]
+  },
+  {
+    "file": "dt_reset.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "DT",
+      "LB"
+    ]
+  },
+  {
+    "file": "in_reset.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "IN",
+      "LB"
+    ]
+  },
+  {
+    "file": "df_reset.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "DT",
+      "DF",
+      "LB"
+    ]
+  },
+  {
+    "file": "begin_plot.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "BP",
+      "IN",
+      "PS"
+    ]
+  },
+  {
+    "file": "comment.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "CO",
+      "SP"
+    ]
+  },
+  {
+    "file": "pe_raw.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "PE",
+      "IN"
+    ]
+  },
+  {
+    "file": "pe_empty.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "commands": [
+      "PE"
+    ]
+  },
+  {
+    "file": "exponent.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "EXPONENT_NOT_ALLOWED"
+  },
+  {
+    "file": "empty_parameter.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "MISSING_PARAMETER"
+  },
+  {
+    "file": "missing_final_terminator.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "MISSING_TERMINATOR"
+  },
+  {
+    "file": "missing_label_terminator.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "UNTERMINATED_LABEL"
+  },
+  {
+    "file": "missing_pe_terminator.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "UNTERMINATED_PE"
+  },
+  {
+    "file": "missing_comment_quote.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "UNTERMINATED_COMMENT"
+  },
+  {
+    "file": "invalid_dt.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "INVALID_DT"
+  },
+  {
+    "file": "unsupported_grammar.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "UNSUPPORTED_SYNTAX"
+  },
+  {
+    "file": "pcl_container.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "UNSUPPORTED_CONTAINER"
+  },
+  {
+    "file": "pdf_signature.hpgl",
+    "kind": "synthetic",
+    "author": "ezhpgl contributors",
+    "error": "UNSUPPORTED_CONTAINER"
+  }
+]

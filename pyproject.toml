@@ -1,0 +1,51 @@
+[build-system]
+requires = ["maturin>=1.11,<2"]
+build-backend = "maturin"
+
+[project]
+name = "ezhpgl"
+dynamic = ["version"]
+description = "Rust-backed HP-GL parsing, labels, bounded PCL/PJL extraction and JSON/SVG export"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["hpgl", "hpgl2", "plt", "cad", "parser"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.scripts]
+ezhpgl = "ezhpgl.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/monozukuri-ai/ezhpgl"
+Repository = "https://github.com/monozukuri-ai/ezhpgl"
+Documentation = "https://github.com/monozukuri-ai/ezhpgl/tree/main/docs"
+Issues = "https://github.com/monozukuri-ai/ezhpgl/issues"
+
+[tool.maturin]
+manifest-path = "crates/ezhpgl-python/Cargo.toml"
+python-source = "python"
+module-name = "ezhpgl._core"
+exclude = [".internal/**/*", ".agents/**/*", ".codex/**/*", ".aws/**/*", "fuzz/**/*", ".venv*/**/*", "**/__pycache__/**/*", "**/*.pyc", "**/.pytest_cache/**/*", "**/.ruff_cache/**/*", "**/AGENTS.md"]
+include = [
+  { path = "LICENSE", format = "sdist" },
+  { path = "tests/**/*", format = "sdist" },
+  { path = "docs/**/*", format = "sdist" },
+  { path = "scripts/**/*", format = "sdist" },
+  { path = "examples/**/*", format = "sdist" },
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100

@@ -1,0 +1,17 @@
+[package]
+name = "ezhpgl-python"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Python bindings for the ezhpgl Rust plot parser"
+publish = false
+
+[lib]
+name = "_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ezhpgl-core.workspace = true
+pyo3.workspace = true

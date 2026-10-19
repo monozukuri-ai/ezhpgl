@@ -17,8 +17,11 @@ geometry can be exported as JSON/SVG under the [generic profile](profile.md).
 | BP without parameters | Empty command, including BPIN; resets lexical label state | plot-as-you-parse behavior |
 | SI SR DI DR LO SL AD SD SS SA CP ES DV TD | Numeric arguments | bounded fixed-cell text profile; 8-bit symbol sets |
 | CF SB | Numeric arguments | only default CF0[,0] / SB0 forms |
-| FI FN | Numeric arguments | Unsupported |
-| AC UL RF TR SV MC CR PS RP VS FS PT TL XT YT CS CA IM DC DP EC AF AH NR OE OA OC OD OF OI OH OO OP OS OW | Numeric framing only | Unsupported |
+| PS | Numeric arguments | Plot extents in plotter units: hard clip, default P1/P2 and IW reset; the larger value is the X extent (length) whichever order the file uses; one argument means square extents; a bare PS restores the profile extents |
+| CR | Numeric arguments | Black/white reference values (all or per component) that rescale later PC values to 0–255 |
+| AF AH | Numeric arguments | HP-GL/1 page advance, handled like a parameterless PG |
+| EC TR MC NR VS FS RP IM DC DP OE OA OC OD OF OI OH OO OP OS OW | Numeric arguments | Accepted without effect: cutter, transparency/merge, not-ready, speed/force, replot, error mask, digitizing and output queries have no geometry in this profile |
+| AC UL RF SV PT XT YT TL CS CA FI FN | Numeric arguments | Ignored with the nonfatal `IGNORED_COMMAND` diagnostic (`ignore_command`): fill anchors, user line types, raster/screened fills, pen thickness, tick marks, HP-GL/1 character sets and font IDs are not modeled, so the result is `partial` |
 | BP with parameters, SM, other unknown/unsupported syntax | Strict error; tolerant opaque semicolon-delimited record | Unsupported |
 | PCL/PJL containers | Raw parser rejects; high-level framing preserves source offsets | explicit mode-0 and metadata subset; length-framed raster omission, pages |
 | HP RTL images / other binary commands | Unknown boundaries stop explicitly | Image decoding unsupported |
@@ -32,8 +35,9 @@ supported command forms before state changes. Unsupported semantics stop plot
 interpretation even when their lexical framing is supported. Tolerant mode returns
 the preceding geometry as partial; it does not silently skip to subsequent lines.
 No special payload is decoded as UTF-8 or split by two-letter-looking content.
-Supported approximate labels and omitted raster/text records continue with
-nonfatal diagnostics, including in strict mode; completeness is partial.
+Supported approximate labels, omitted raster/text records and ignored
+geometry-affecting commands continue with nonfatal diagnostics, including in
+strict mode; completeness is partial.
 See [text/container contract](text-and-containers.md) for exact variants and limits.
 
 See [drawing contract](drawing.md) for reset rules, resource bounds,

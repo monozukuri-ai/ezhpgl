@@ -266,9 +266,8 @@ fn dependency_quality_clears_only_after_absolute_positioning_or_reset() {
 
 #[test]
 fn unsupported_text_settings_stop_before_dependent_geometry() {
-    for cmd in [
-        "LO21;", "SD2,1;", "AD1,999;", "SB1;", "CF1;", "ES-1;", "FI1;",
-    ] {
+    // FI/FN are ignored with a warning since 0.1.0a2; the others still stop
+    for cmd in ["LO21;", "SD2,1;", "AD1,999;", "SB1;", "CF1;", "ES-1;"] {
         let input = format!("SP1;PD40,0;{cmd}LBabc\x03PD80,0;");
         assert!(parse(input.as_bytes(), InterpretOptions::default()).is_err());
         let d = parse(input.as_bytes(), tolerant()).unwrap();

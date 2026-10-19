@@ -87,8 +87,8 @@ def test_write_outputs_pathlike_and_no_writes_on_invalid_export(tmp_path):
 
 
 @pytest.mark.parametrize("data,code", [
-    (b"VS1;PD80,0;", "UNSUPPORTED_COMMAND"),
-    (b"FI12;PD80,0;", "UNSUPPORTED_COMMAND"),
+    (b"PS0;PD80,0;", "INVALID_ARGUMENTS"),
+    (b"BP5;PD80,0;", "UNSUPPORTED_SYNTAX"),
     (b"ZZ;PD80,0;", "UNSUPPORTED_SYNTAX"),
     (b"PR1e2,0;PD80,0;", "EXPONENT_NOT_ALLOWED"),
     (b"PD40,40,80;", "INVALID_ARGUMENTS"),
@@ -164,7 +164,7 @@ def test_installed_export_cli_from_other_directory(tmp_path, format, page, expec
 @pytest.mark.parametrize("tolerant,expected", [(False, 1), (True, 2)])
 def test_cli_partial_output_is_explicit(tmp_path, tolerant, expected):
     source = tmp_path / "partial.hpgl"
-    source.write_bytes(b"SP1;PD40,0;VS1;PD400,0;")
+    source.write_bytes(b"SP1;PD40,0;BP5;PD400,0;")
     output = tmp_path / "partial.svg"
     command = [sys.executable, "-m", "ezhpgl", "export", str(source), "--format", "svg", "-o", str(output)]
     if tolerant:
@@ -172,7 +172,7 @@ def test_cli_partial_output_is_explicit(tmp_path, tolerant, expected):
     result = subprocess.run(command, capture_output=True, text=True)
     assert result.returncode == expected
     if tolerant:
-        assert json.loads(result.stdout)["diagnostics"][0]["command"] == "VS"
+        assert json.loads(result.stdout)["diagnostics"][0]["command"] == "BP"
         assert ET.fromstring(output.read_text()).attrib["data-completeness"] == "partial"
     else:
         assert not output.exists()

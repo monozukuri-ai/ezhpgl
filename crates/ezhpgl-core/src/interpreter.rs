@@ -288,10 +288,12 @@ impl Interpreter {
             return Err(error("LIMIT_EXCEEDED", "Page limit exceeded", span, None));
         }
         self.page.index = self.pages.len();
-        self.pages.push(std::mem::replace(
-            &mut self.page,
-            Self::empty_page(self.options.profile),
-        ));
+        let mut next = Self::empty_page(self.options.profile);
+        if let Some(size) = self.state.space.plot_size {
+            // PS extents persist across pages until a bare PS restores the profile
+            next.plot_size_mm = Some([size[0] / 40., size[1] / 40.]);
+        }
+        self.pages.push(std::mem::replace(&mut self.page, next));
         Ok(())
     }
     fn pending(&self) -> Pending {
@@ -611,7 +613,7 @@ impl Interpreter {
                 self.buffer = Arc::default();
                 self.buffer_approximate = false;
             }
-            "IP" | "IR" | "SC" | "RO" | "IW" => {
+            "IP" | "IR" | "SC" | "RO" | "IW" | "PS" => {
                 let mut space = self.state.space.clone();
                 let args: Vec<f64> = numbers.iter().map(|n| n.value).collect();
                 space
@@ -627,6 +629,13 @@ impl Interpreter {
                 self.state.attributes = attrs;
                 self.state.attributes.break_path();
                 self.state.path_id += 1;
+                if c.name() == "PS" {
+                    self.page.plot_size_mm = self
+                        .state
+                        .space
+                        .plot_size
+                        .map(|size| [size[0] / 40., size[1] / 40.]);
+                }
             }
             "PA" | "PR" | "PU" | "PD" => {
                 if numbers.len() % 2 != 0 {
@@ -675,7 +684,7 @@ impl Interpreter {
                 let args: Vec<_> = numbers.iter().map(|n| n.value).collect();
                 self.text_command(c, &args)?;
             }
-            "PW" | "WU" | "PC" | "NP" | "LT" | "LA" | "FT" => {
+            "PW" | "WU" | "PC" | "NP" | "LT" | "LA" | "FT" | "CR" => {
                 let args: Vec<f64> = numbers.iter().map(|n| n.value).collect();
                 let mut attrs = self.state.attributes.clone();
                 let mut pen = self.state.pen;
@@ -691,6 +700,43 @@ impl Interpreter {
                 self.state.attributes = attrs;
                 self.state.pen = pen;
                 self.state.path_id += 1;
+            }
+            "EC" | "TR" | "MC" | "NR" | "VS" | "FS" | "RP" | "IM" | "DC" | "DP" | "OE" | "OA"
+            | "OC" | "OD" | "OF" | "OI" | "OH" | "OO" | "OP" | "OS" | "OW" => {
+                // Device control, output and digitizing commands have no geometry in this
+                // profile; they are accepted without effect so real plot files keep going.
+            }
+            "AC" | "UL" | "RF" | "SV" | "PT" | "XT" | "YT" | "TL" | "CS" | "CA" | "FI" | "FN" => {
+                self.warning(
+                    "IGNORED_COMMAND",
+                    "Fill anchors, user line types, raster/screened fills, tick marks, HP-GL/1 character sets and font IDs are not modeled; the command was ignored",
+                    c.span,
+                    Some(c.name()),
+                    "ignore_command",
+                )?;
+            }
+            "AF" | "AH" => {
+                // HP-GL/1 page advance: eject the page like a parameterless PG.
+                if !numbers.is_empty() {
+                    return Err(fail(
+                        "INVALID_ARGUMENTS",
+                        "This command requires no arguments",
+                    ));
+                }
+                if !self.pcl_context
+                    && (!self.page.operations.is_empty() || self.page.omitted_content)
+                {
+                    self.finish_page(c.span)?;
+                }
+                self.state.position = Point::default();
+                self.state.position_approximate = false;
+                self.state.text.carriage_return = Point::default();
+                self.state.down = false;
+                self.state.path_id += 1;
+                self.state.attributes.break_path();
+                self.state.polygon = polygon::Cursor::default();
+                self.buffer = Arc::default();
+                self.buffer_approximate = false;
             }
             _ => {
                 return Err(fail(

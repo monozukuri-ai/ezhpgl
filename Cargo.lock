@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "ezhpgl-core"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -12,7 +12,7 @@ dependencies = [
 
 [[package]]
 name = "ezhpgl-python"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 dependencies = [
  "ezhpgl-core",
  "pyo3",

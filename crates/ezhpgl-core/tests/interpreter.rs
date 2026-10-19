@@ -26,6 +26,41 @@ fn xy(doc: &PlotDocument, page: usize, op: usize) -> Vec<(f64, f64)> {
 }
 
 #[test]
+fn device_control_commands_are_accepted_and_ignored_ones_are_reported() {
+    // A CAD plot header: device control has no geometry and keeps the plot complete
+    let d = read(
+        b"BP;IN;PS23760,33640;EC;NP256;PA;LA1,4,2,4;TR0;MC0;NR;VS10;FS5;SP1;PU0,0;PD400,0;OE;IM;",
+    );
+    assert_eq!(d.completeness, "complete");
+    assert_eq!(d.pages[0].operations.len(), 1);
+    // the larger PS value is the X extent (an A1 landscape plot)
+    assert_eq!(d.pages[0].plot_size_mm, Some([841., 594.]));
+    // Commands that would change fills, patterns, ticks or fonts are ignored with a warning
+    let d = read(b"IN;AC0,0;UL1,50,50;XT;SP1;PA0,0;PD400,0;");
+    assert_eq!(d.completeness, "partial");
+    assert_eq!(d.diagnostics.len(), 1);
+    assert_eq!(d.diagnostics[0].code, "IGNORED_COMMAND");
+    assert_eq!(d.diagnostics[0].action, "ignore_command");
+    assert_eq!(d.diagnostics[0].command.as_deref(), Some("AC"));
+    assert_eq!(d.pages[0].operations.len(), 1);
+    // AF/AH advance the page like a parameterless PG
+    let d = read(b"IN;SP1;PA0,0;PD400,0;AF;SP1;PA0,0;PD400,0;AH;");
+    assert_eq!(d.pages.len(), 2);
+    assert_eq!(d.final_state.position, Point { x: 0., y: 0. });
+    // CR rescales the PC components to the generic 0..255 palette
+    let d = read(b"IN;CR0,100;PC1,100,0,50;SP1;PA0,0;PD400,0;CR;PC2,255,255,0;SP2;PD800,0;");
+    assert_eq!(d.pages[0].operations[0].style.color, "#ff0080");
+    assert_eq!(d.pages[0].operations[1].style.color, "#ffff00");
+    assert_eq!(
+        parse(b"CR5,5;", InterpretOptions::default())
+            .unwrap_err()
+            .diagnostic
+            .code,
+        "INVALID_ARGUMENTS"
+    );
+}
+
+#[test]
 fn absolute_relative_and_pen_up_moves() {
     let d = read(b"INSP1PA40,80PD120,80,120,160PR-40,0,0,-40PU40,40PD-40,-40PA0,0;");
     assert_eq!(d.completeness, "complete");
@@ -136,15 +171,10 @@ fn source_spans_and_optional_raw_retention() {
 
 #[test]
 fn unsupported_commands_never_contaminate_later_geometry() {
-    for instruction in [
-        "VS10;",
-        "TR0;",
-        "PS400,800;",
-        "FI12;",
-        "RF2;",
-        "SV0;",
-        "ZZ;",
-    ] {
+    // Unknown mnemonics and BP with parameters are the remaining unsupported syntax;
+    // device-control commands are accepted and geometry-affecting ones are ignored
+    // with a warning instead (see device_control_commands_are_accepted_and_ignored_ones_are_reported).
+    for instruction in ["ZZ;", "BP5;", "PS0,10;"] {
         let input = format!("SP1;PD40,0;{instruction}IN;SP2;PD80,0;");
         assert!(parse(input.as_bytes(), InterpretOptions::default()).is_err());
         let d = parse(input.as_bytes(), tolerant()).unwrap();
@@ -170,11 +200,11 @@ fn lexical_recovery_is_not_semantic_recovery() {
     assert_eq!(tail.completeness, "partial");
     // An earlier semantic error wins over a later lexical error.
     assert_eq!(
-        parse(b"VS5;LBbad", InterpretOptions::default())
+        parse(b"PS0;LBbad", InterpretOptions::default())
             .unwrap_err()
             .diagnostic
             .code,
-        "UNSUPPORTED_COMMAND"
+        "INVALID_ARGUMENTS"
     );
 }
 
@@ -274,7 +304,7 @@ fn svg_preserves_continuity_but_never_connects_pen_up_travel() {
 
 #[test]
 fn json_is_versioned_and_does_not_embed_raw_source() {
-    let d = parse(b"SP1;PD40,80;VS1;", tolerant()).unwrap();
+    let d = parse(b"SP1;PD40,80;AC0,0;", tolerant()).unwrap();
     let json: serde_json::Value = serde_json::from_str(&d.to_json().unwrap()).unwrap();
     assert_eq!(json["schema_version"], 1);
     assert_eq!(json["units"], "mm");

@@ -156,6 +156,61 @@ fn device_defaults_are_explicit_and_paper_is_only_metadata() {
 }
 
 #[test]
+fn ps_sets_plot_extents_default_points_window_and_page_size() {
+    let d = read("IN;PS4000,2000;RO90;SP1;PA0,0;PD400,0;PG;SP1;PA0,0;PD400,0;");
+    assert_eq!(d.completeness, "complete");
+    assert_eq!(d.pages[0].plot_size_mm, Some([100., 50.]));
+    assert_eq!(d.pages[1].plot_size_mm, Some([100., 50.]));
+    // RO90 maps (x, y) to (W - y, x) with the PS width W = 100 mm
+    let points: Vec<_> = d.pages[0].operations[0]
+        .geometry
+        .points()
+        .iter()
+        .map(|p| (p.x, p.y))
+        .collect();
+    assert_eq!(points, [(100., 0.), (100., 10.)]);
+    let transform = d.final_state.transform.unwrap();
+    assert_eq!(
+        transform.clip.unwrap().bounds(),
+        Some(bounds(0., 0., 100., 50.))
+    );
+    // RO keeps the numeric P1/P2 that PS set before the rotation
+    assert_eq!(transform.p2_plotter_units, Some(point(4000., 2000.)));
+    // the larger PS value is the X extent whichever order the file uses
+    let d = read("IN;PS2000,4000;SP1;PA0,0;PD3000,1000;");
+    assert_eq!(d.pages[0].plot_size_mm, Some([100., 50.]));
+    let transform = d.final_state.transform.unwrap();
+    assert_eq!(transform.p2_plotter_units, Some(point(4000., 2000.)));
+    assert_eq!(
+        transform.clip.unwrap().bounds(),
+        Some(bounds(0., 0., 100., 50.))
+    );
+    assert_eq!(d.pages[0].bounds.unwrap().max, point(75., 25.));
+    // IW resets to the hard clip, one argument means square extents
+    let d = read("IN;IW0,0,100,100;PS800;SP1;PA0,0;PD800,800;");
+    assert_eq!(d.pages[0].plot_size_mm, Some([20., 20.]));
+    assert_eq!(
+        d.final_state.transform.unwrap().clip.unwrap().bounds(),
+        Some(bounds(0., 0., 20., 20.))
+    );
+    // a bare PS restores the profile extents (unknown without a profile)
+    let d = read("IN;PS800;PS;SP1;PA0,0;PD800,800;");
+    assert_eq!(d.pages[0].plot_size_mm, None);
+    assert!(d.final_state.transform.is_none());
+    let d = profiled("PS800;PS;");
+    assert_eq!(d.pages[0].plot_size_mm, Some([100., 50.]));
+    for s in ["PS0,10;", "PS10,20,30;", "PS-5;"] {
+        assert_eq!(
+            parse(s.as_bytes(), InterpretOptions::default())
+                .unwrap_err()
+                .diagnostic
+                .code,
+            "INVALID_ARGUMENTS"
+        );
+    }
+}
+
+#[test]
 fn df_preserves_points_rotation_cursor_and_pen_but_in_resets_space() {
     let d = profiled("SP2;PA40,80;IP400,800,1200,1600;RO90;SC0,1,0,1;IW0,0,1,1;PD;DF;");
     let t = d.final_state.transform.unwrap();

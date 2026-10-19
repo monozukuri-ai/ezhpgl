@@ -90,10 +90,10 @@ remaining input. The diagnostic action is `stop_interpretation`; final_state is
 the state before the failed command. Resource limits always raise. `complete`
 means complete within [the selected profile](profile.md), not device fidelity.
 
-`TEXT_APPROXIMATION`, `UNMAPPED_TEXT_BYTE`, `OMITTED_RASTER` and `OMITTED_PCL_TEXT`
-are nonfatal in both modes. They make output partial while interpretation continues.
+`TEXT_APPROXIMATION`, `UNMAPPED_TEXT_BYTE`, `OMITTED_RASTER`, `OMITTED_PCL_TEXT`
+and `IGNORED_COMMAND` are nonfatal in both modes. They make output partial while interpretation continues.
 Check diagnostic actions (`approximate_text`, `replace_glyph`, `omit_content`,
-`stop_interpretation`) rather than treating every partial result as a stopped parse.
+`ignore_command`, `stop_interpretation`) rather than treating every partial result as a stopped parse.
 Warnings are coalesced by code; label and page metadata retain individual details.
 Optional JSON fields are omitted when absent or false.
 Label bytes are stored as integer arrays in JSON; the full raw source is not embedded.

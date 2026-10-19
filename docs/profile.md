@@ -14,7 +14,8 @@ not a hardware model. `DeviceProfile` supplies optional extents to this profile.
 | Preview style | Initially all positive pens black, 0.35 mm; butt caps, miter joins (limit 5); explicit PD start dots; Pen attribute commands override these defaults |
 | Paper size | Unknown unless `DeviceProfile(paper_size_mm=(w,h))` supplies metadata; separate from content and clipping |
 | Plot extents | Unknown unless `DeviceProfile(plot_size_mm=(w,h))` supplies a zero-origin hard clip and default P1/P2 |
-| IN | Parameterless; absolute mode, physical origin, pen up, rotation 0, scaling off, default P1/P2 and clip; preserves selected pen and existing drawing |
+| IN | Parameterless; absolute mode, physical origin, pen up, rotation 0, scaling off, default P1/P2 and clip; preserves selected pen, `PS` extents and existing drawing |
+| PS | `length[,width]` in plotter units; sets the hard clip, default P1/P2 and resets IW, keeping rotation and scaling; the larger value is the X extent (length) whichever order the file uses, as on HP devices; one argument means square extents; a bare PS restores the profile extents |
 | DF | Parameterless; absolute mode, scaling off, default clip; preserves position, P1/P2, rotation, selected pen, up/down state and existing drawing |
 | PA / PR | Change absolute/relative mode; optional X,Y pairs move with current pen state |
 | PU / PD | Change pen state; optional X,Y pairs use current coordinate mode |
@@ -48,7 +49,8 @@ are bounded to magnitude 2^30 before command-specific conversion.
 
 `RO` accepts 0, 90, 180 or 270 degrees, rounded to integer; omitted means 0.
 Rotation is not cumulative. It rotates and shifts the origin within known plot
-extents; nonzero rotation without extents raises `MISSING_DEVICE_BOUNDS`.
+extents (from the profile or `PS`); nonzero rotation without extents raises
+`MISSING_DEVICE_BOUNDS`.
 For width W and height H, the physical mappings are (x,y), (W-y,x),
 (W-x,H-y), and (y,H-x). P1/P2 keep their numeric values; `IP;`/`IR;` after rotation
 restore defaults for the new orientation. Transform changes never move the
@@ -132,5 +134,8 @@ Transform and PE semantics follow the guide's IP/IR/IW (191–198), PE (243–24
 and SC (290–295) sections. PE's portable fractional-bit range follows PCL Part II
 20-36. Native-device quantization and degenerate clipping behavior are not qualified.
 Curves, styles and polygon fills follow the additional [drawing contract](drawing.md).
-Labels and bounded containers follow the text/container contract; `PS` sizing and device control commands remain
-unsupported and stop interpretation explicitly.
+Labels and bounded containers follow the text/container contract; `PS` sets the
+plot extents (page `plot_size_mm` reports it), device-control commands are
+accepted without effect and geometry-affecting commands outside the profile
+(AC, UL, RF, SV, PT, XT, YT, TL, CS, CA, FI, FN) are ignored with the
+nonfatal `IGNORED_COMMAND` diagnostic (see the support matrix).

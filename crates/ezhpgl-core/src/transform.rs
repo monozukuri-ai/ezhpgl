@@ -97,6 +97,7 @@ pub(crate) struct Space {
     scaling: Scaling,
     window: Option<Window>,
     pub plot_size: Option<[f64; 2]>, // unrotated physical extents, plotter units
+    default_plot_size: Option<[f64; 2]>, // the profile's extents, restored by a bare PS
 }
 
 pub(crate) type TransformError = (&'static str, &'static str);
@@ -162,6 +163,7 @@ impl Space {
             p1: Point::default(),
             p2: plot_size.map(|s| Point { x: s[0], y: s[1] }),
             plot_size,
+            default_plot_size: plot_size,
             rotation: 0,
             scaling: Scaling::Off,
             window: None,
@@ -451,6 +453,38 @@ impl Space {
                         Window::User(b)
                     })
                 };
+            }
+            "PS" => {
+                if args.len() > 2 {
+                    return Err(INVALID);
+                }
+                // PS defines the plot extents: the hard-clip limits, the default P1/P2 and
+                // the soft window return to their defaults for the new size. Rotation and
+                // scaling are kept. A bare PS restores the profile's extents. One argument
+                // (the length) means square extents in this device-independent profile.
+                self.plot_size = if args.is_empty() {
+                    self.default_plot_size
+                } else {
+                    let length = hp_round(args[0]);
+                    let width = if args.len() == 2 {
+                        hp_round(args[1])
+                    } else {
+                        length
+                    };
+                    if length <= 0. || width <= 0. || length > 8_388_607. || width > 8_388_607. {
+                        return Err(INVALID);
+                    }
+                    // HP devices place the larger value along the X-axis (the plot
+                    // length) whichever order the file uses: plotter drivers emit
+                    // `PS length,width` for portrait and landscape drawings alike.
+                    Some(if length >= width {
+                        [length, width]
+                    } else {
+                        [width, length]
+                    })
+                };
+                self.window = None;
+                self.reset_points();
             }
             _ => return Err(INVALID),
         }

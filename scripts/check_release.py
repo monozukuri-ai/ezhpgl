@@ -15,7 +15,13 @@ from check_dist import check as check_payload
 from packaging.utils import canonicalize_name, parse_sdist_filename, parse_wheel_filename
 from packaging.version import Version
 
-TARGETS = {"manylinux_2_28_x86_64", "win_amd64", "macos_x86_64", "macos_arm64"}
+TARGETS = {
+    "manylinux_2_28_x86_64",
+    "manylinux_2_28_aarch64",
+    "win_amd64",
+    "macos_x86_64",
+    "macos_arm64",
+}
 
 
 def release_version(root: Path, tag: str | None = None) -> Version:
@@ -47,6 +53,8 @@ def wheel_target(tags: set) -> str:
     platforms = {t.platform for t in tags}
     if platforms == {"manylinux_2_28_x86_64"}:
         return "manylinux_2_28_x86_64"
+    if platforms == {"manylinux_2_28_aarch64"}:
+        return "manylinux_2_28_aarch64"
     if platforms == {"win_amd64"}:
         return "win_amd64"
     for arch in ("x86_64", "arm64"):

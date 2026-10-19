@@ -68,8 +68,11 @@ partial result, and `1` for an error. See [CLI options](docs/cli.md).
 The parser uses an explicit generic plotter profile. It does not emulate every
 printer or recover the original CAD layers, dimensions or model scale.
 
-- Automatic `PS` plot sizing and several device-control commands are unsupported.
-  Supplying a profile does not make an unsupported command executable.
+- `PS` sets the plot extents; the larger value is the X extent (length), as on
+  HP devices, and one argument means square extents in this device-independent
+  profile. Device-control commands are accepted without
+  effect; fill anchors, user line types, tick marks and HP-GL/1 character sets
+  are ignored with the nonfatal `IGNORED_COMMAND` diagnostic.
 - Text previews use substitute fonts. Native fonts, Japanese/multibyte labels,
   and downloaded fonts are unsupported.
 - PCL/PJL support is limited. Supported raster blocks are omitted with diagnostics;

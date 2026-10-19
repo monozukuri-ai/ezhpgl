@@ -99,7 +99,7 @@ input and stopped input: inspect diagnostic actions and `interpreted_commands`.
 This profile extracts HP-GL coordinates; it does not map PCL margins, page size,
 picture frames or printer origins. `DeviceProfile` remains the explicit HP-GL plot
 extent/clip contract. Unknown commands that could affect these settings stop
-interpretation. `PS` is still unsupported.
+interpretation. `PS` sets plot extents as in the generic profile.
 
 | Record | Handling |
 |---|---|

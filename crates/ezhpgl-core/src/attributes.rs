@@ -47,6 +47,8 @@ pub(crate) struct Attributes {
     miter: f64,
     pub fill_type: u8,
     pub hatch: [HatchSpec; 2],
+    // CR black/white reference values per RGB component; PC values are mapped to 0..255
+    color_range: [f64; 6],
 }
 impl Default for Attributes {
     fn default() -> Self {
@@ -56,6 +58,7 @@ impl Default for Attributes {
             widths: Arc::default(),
             width: 0.35,
             relative_width: false,
+            color_range: [0., 255., 0., 255., 0., 255.],
             line: LineSpec::default(),
             phase: 0.,
             last_end: None,
@@ -200,7 +203,13 @@ impl Attributes {
                         }
                         let rgb = a[1..]
                             .iter()
-                            .map(|v| int(v.clamp(0., 255.)) as u8)
+                            .enumerate()
+                            .map(|(i, v)| {
+                                let (black, white) =
+                                    (self.color_range[2 * i], self.color_range[2 * i + 1]);
+                                let scaled = (v - black) / (white - black) * 255.;
+                                int(scaled.clamp(0., 255.)) as u8
+                            })
                             .collect::<Vec<_>>();
                         Arc::make_mut(&mut self.colors)
                             .insert(id, format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2]));
@@ -333,9 +342,25 @@ impl Attributes {
                     }
                 }
             }
+            "CR" => {
+                if !matches!(a.len(), 0 | 2 | 6) {
+                    return Err(INVALID);
+                }
+                let ranges: Vec<f64> = match a.len() {
+                    0 => vec![0., 255., 0., 255., 0., 255.],
+                    2 => vec![a[0], a[1], a[0], a[1], a[0], a[1]],
+                    _ => a.to_vec(),
+                };
+                if ranges.chunks(2).any(|pair| pair[0] == pair[1]) {
+                    return Err(INVALID);
+                }
+                self.color_range = [
+                    ranges[0], ranges[1], ranges[2], ranges[3], ranges[4], ranges[5],
+                ];
+            }
             _ => return Err(INVALID),
         }
-        if !matches!(name, "FT" | "PC" | "NP") {
+        if !matches!(name, "FT" | "PC" | "NP" | "CR") {
             self.break_path();
         }
         Ok(())

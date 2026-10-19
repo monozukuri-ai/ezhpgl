@@ -2,6 +2,7 @@
 
 import shutil
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -27,13 +28,21 @@ def test_reject_wrong_tag(tag):
         release_version(ROOT, tag)
 
 
-def test_reject_stale_lock(tmp_path):
+@pytest.mark.parametrize("crate", ["ezhpgl-core", "ezhpgl-python"])
+def test_reject_stale_lock(tmp_path, crate):
     for name in ("Cargo.toml", "Cargo.lock", "pyproject.toml"):
         shutil.copyfile(ROOT / name, tmp_path / name)
     shutil.copytree(ROOT / "crates", tmp_path / "crates")
+    version = release_version(tmp_path)
+    rust_version = tomllib.loads((tmp_path / "Cargo.toml").read_text())["workspace"]["package"]["version"]
     lock = tmp_path / "Cargo.lock"
-    lock.write_text(lock.read_text().replace('version = "0.1.0-alpha.1"', 'version = "9.9.9"'))
-    with pytest.raises(ValueError, match="Cargo.lock version mismatch"):
+    original = lock.read_text()
+    entry = f'name = "{crate}"\nversion = "{rust_version}"'
+    assert original.count(entry) == 1
+    lock.write_text(original.replace(
+        entry, f'name = "{crate}"\nversion = "{version.major + 1}.0.0"', 1
+    ))
+    with pytest.raises(ValueError, match=f"Cargo.lock version mismatch for {crate}"):
         release_version(tmp_path)
 
 

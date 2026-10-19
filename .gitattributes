@@ -1,0 +1,5 @@
+# Plot commands and container payloads use byte offsets and may contain binary data.
+*.hpgl -text
+*.hpg -text
+*.plt -text
+*.pcl -text

@@ -301,6 +301,13 @@ fn detection_is_prefix_based_and_dialect_ambiguous() {
     assert_eq!(detect_format(b"anything.plt").container, "unknown");
     assert_eq!(detect_format(b"\x1b%0B").container, "pcl_or_control");
     assert_eq!(detect_format(b"\x1b%-12345X").container, "pjl");
+    // A binary drawing whose first bytes spell a mnemonic (ARCDRAW .awf: "AD2008\0\0...")
+    let awf = b"AD2008\0\0\x01\x02\x03\x04\xff\xfe";
+    assert_eq!(detect_format(awf).container, "binary");
+    assert_eq!(detect_format(awf).language, "unknown");
+    assert!(detect_format(b"AD1,2;LBabc\x03PA0,0;").language == "hpgl_family");
+    let stopped = parse_commands(awf, ParseOptions::default()).unwrap_err();
+    assert_eq!(stopped.diagnostic.code, "UNSUPPORTED_CONTAINER");
 }
 
 #[test]

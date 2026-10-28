@@ -92,6 +92,7 @@ def test_iter_commands_retains_buffer():
 @pytest.mark.parametrize("data,container", [
     (b"IN;", "plain"), (b"%PDF-1.7", "pdf"), (b"%!PS", "postscript"),
     (b"\x1b%-12345X@PJL", "pjl"), (b"\x1b%0B", "pcl_or_control"), (b"", "unknown"),
+    (b"AD2008\x00\x00\x01\x02binary drawing", "binary"),  # ARCDRAW .awf, not the AD command
 ])
 def test_detection(data, container):
     result = raw.detect_format(data)

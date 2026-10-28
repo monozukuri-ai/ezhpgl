@@ -5,12 +5,12 @@ exclude = ["fuzz"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0-alpha.2"
+version = "0.1.0-alpha.3"
 edition = "2021"
 rust-version = "1.85"
 license = "MIT"
 repository = "https://github.com/monozukuri-ai/ezhpgl"
 
 [workspace.dependencies]
-ezhpgl-core = { path = "crates/ezhpgl-core", version = "0.1.0-alpha.2" }
+ezhpgl-core = { path = "crates/ezhpgl-core", version = "0.1.0-alpha.3" }
 pyo3 = { version = "0.29.3", features = ["abi3-py310"] }

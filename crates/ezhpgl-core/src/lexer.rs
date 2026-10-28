@@ -57,12 +57,17 @@ pub(crate) fn parse_input(
         ));
     }
     let detection = detect_format(&parser.data);
-    if matches!(detection.container, "pdf" | "postscript")
+    if matches!(detection.container, "pdf" | "postscript" | "binary")
         || (!containers && matches!(detection.container, "pjl" | "pcl_or_control"))
     {
+        let message = if detection.container == "binary" {
+            "Binary content; not an HP-GL command stream"
+        } else {
+            "Unsupported container for this API"
+        };
         return Err(parser.error(
             "UNSUPPORTED_CONTAINER",
-            "Unsupported container for this API",
+            message,
             0,
             parser.data.len().min(16),
         ));

@@ -26,7 +26,11 @@ fn looks_binary(data: &[u8]) -> bool {
     let control = head
         .iter()
         .filter(|&&b| {
-            b < 0x20 && !matches!(b, 0 | b'\t' | b'\n' | b'\r' | 0x03 | 0x0c | 0x0e | 0x0f | 0x1b)
+            b < 0x20
+                && !matches!(
+                    b,
+                    0 | b'\t' | b'\n' | b'\r' | 0x03 | 0x0c | 0x0e | 0x0f | 0x1b
+                )
         })
         .count();
     control * 10 > head.len()

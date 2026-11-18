@@ -15,7 +15,7 @@ not a hardware model. `DeviceProfile` supplies optional extents to this profile.
 | Paper size | Unknown unless `DeviceProfile(paper_size_mm=(w,h))` supplies metadata; separate from content and clipping |
 | Plot extents | Unknown unless `DeviceProfile(plot_size_mm=(w,h))` supplies a zero-origin hard clip and default P1/P2 |
 | IN | Parameterless; absolute mode, physical origin, pen up, rotation 0, scaling off, default P1/P2 and clip; preserves selected pen, `PS` extents and existing drawing |
-| PS | `length[,width]` in plotter units; sets the hard clip, default P1/P2 and resets IW, keeping rotation and scaling; the larger value is the X extent (length) whichever order the file uses, as on HP devices; one argument means square extents; a bare PS restores the profile extents |
+| PS | `length[,width]` in plotter units; sets the hard clip, default P1/P2 and resets IW, keeping rotation and scaling; the larger value is the X extent (length) whichever order the file uses, as on HP devices; one argument means square extents; a bare PS restores the profile extents; a single value of 0-127 is the paper-size selector of classic HP-GL plotters (`PS0;`, `PS4;`): the extents stay the profile's, or unknown without one |
 | DF | Parameterless; absolute mode, scaling off, default clip; preserves position, P1/P2, rotation, selected pen, up/down state and existing drawing |
 | PA / PR | Change absolute/relative mode; optional X,Y pairs move with current pen state |
 | PU / PD | Change pen state; optional X,Y pairs use current coordinate mode |

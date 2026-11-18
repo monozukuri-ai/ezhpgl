@@ -17,7 +17,7 @@ geometry can be exported as JSON/SVG under the [generic profile](profile.md).
 | BP without parameters | Empty command, including BPIN; resets lexical label state | plot-as-you-parse behavior |
 | SI SR DI DR LO SL AD SD SS SA CP ES DV TD | Numeric arguments | bounded fixed-cell text profile; 8-bit symbol sets |
 | CF SB | Numeric arguments | only default CF0[,0] / SB0 forms |
-| PS | Numeric arguments | Plot extents in plotter units: hard clip, default P1/P2 and IW reset; the larger value is the X extent (length) whichever order the file uses; one argument means square extents; a bare PS restores the profile extents |
+| PS | Numeric arguments | Plot extents in plotter units: hard clip, default P1/P2 and IW reset; the larger value is the X extent (length) whichever order the file uses; one argument means square extents; a bare PS restores the profile extents; a single value of 0-127 is the paper-size selector of classic HP-GL plotters (`PS0;`, `PS4;`): the extents stay the profile's, or unknown without one |
 | CR | Numeric arguments | Black/white reference values (all or per component) that rescale later PC values to 0–255 |
 | AF AH | Numeric arguments | HP-GL/1 page advance, handled like a parameterless PG |
 | EC TR MC NR VS FS RP IM DC DP OE OA OC OD OF OI OH OO OP OS OW | Numeric arguments | Accepted without effect: cutter, transparency/merge, not-ready, speed/force, replot, error mask, digitizing and output queries have no geometry in this profile |

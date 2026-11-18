@@ -200,7 +200,7 @@ fn lexical_recovery_is_not_semantic_recovery() {
     assert_eq!(tail.completeness, "partial");
     // An earlier semantic error wins over a later lexical error.
     assert_eq!(
-        parse(b"PS0;LBbad", InterpretOptions::default())
+        parse(b"PS-5;LBbad", InterpretOptions::default())
             .unwrap_err()
             .diagnostic
             .code,

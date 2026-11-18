@@ -458,6 +458,15 @@ impl Space {
                 if args.len() > 2 {
                     return Err(INVALID);
                 }
+                // Classic HP-GL plotters (7475A, 7550A) use `PS n` to select the paper
+                // size that is loaded: 0-3 the larger sheet, 4-127 the smaller one.
+                // HP-GL/2 plot sizes are lengths in plotter units (40 per mm), far above
+                // that range, so a single value of 0-127 is the selector. The sheet's
+                // dimensions belong to the device: the extents stay as they are (the
+                // profile's, or unknown without one), as if the file had no PS.
+                if args.len() == 1 && (0. ..=127.).contains(&hp_round(args[0])) {
+                    return Ok(());
+                }
                 // PS defines the plot extents: the hard-clip limits, the default P1/P2 and
                 // the soft window return to their defaults for the new size. Rotation and
                 // scaling are kept. A bare PS restores the profile's extents. One argument

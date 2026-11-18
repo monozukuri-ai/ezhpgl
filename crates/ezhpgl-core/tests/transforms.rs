@@ -199,6 +199,18 @@ fn ps_sets_plot_extents_default_points_window_and_page_size() {
     assert!(d.final_state.transform.is_none());
     let d = profiled("PS800;PS;");
     assert_eq!(d.pages[0].plot_size_mm, Some([100., 50.]));
+    // classic HP-GL: `PS n` (0-127) selects the loaded paper size; the extents
+    // stay the profile's, or unknown without one, and the plot continues
+    for s in ["PS0;", "PS3;", "PS4;", "PS127;"] {
+        let d = read(&format!("IN;{s}SP1;PA0,0;PD800,800;"));
+        assert_eq!(d.pages[0].plot_size_mm, None, "{s}");
+        assert!(d.diagnostics.is_empty(), "{s}");
+        let d = profiled(s);
+        assert_eq!(d.pages[0].plot_size_mm, Some([100., 50.]), "{s}");
+    }
+    // the next value is a plot length again
+    let d = read("IN;PS128;SP1;PA0,0;PD80,80;");
+    assert_eq!(d.pages[0].plot_size_mm, Some([3.2, 3.2]));
     for s in ["PS0,10;", "PS10,20,30;", "PS-5;"] {
         assert_eq!(
             parse(s.as_bytes(), InterpretOptions::default())

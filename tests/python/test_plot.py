@@ -87,7 +87,7 @@ def test_write_outputs_pathlike_and_no_writes_on_invalid_export(tmp_path):
 
 
 @pytest.mark.parametrize("data,code", [
-    (b"PS0;PD80,0;", "INVALID_ARGUMENTS"),
+    (b"PS-5;PD80,0;", "INVALID_ARGUMENTS"),
     (b"BP5;PD80,0;", "UNSUPPORTED_SYNTAX"),
     (b"ZZ;PD80,0;", "UNSUPPORTED_SYNTAX"),
     (b"PR1e2,0;PD80,0;", "EXPONENT_NOT_ALLOWED"),
